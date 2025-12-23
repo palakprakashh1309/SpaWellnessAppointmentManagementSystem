@@ -1,0 +1,29 @@
+﻿@{
+    Layout = "_Layout";
+}
+
+<div class="container py-5">
+    <h1 class="display-4">Serenity Spa</h1>
+    <p class="lead">Bootstrap + Razor sanity test.</p>
+    <button id="toggleAuth" class="btn btn-primary">Toggle</button>
+</div>
+
+<script>
+    (function () {
+        var t = document.getElementById('toggleAuth');
+        if (t) {
+            t.addEventListener('click', function () {
+                alert('OK');
+            });
+        }
+    })();
+</script>
+
+
+
+
+
+
+
+
+
