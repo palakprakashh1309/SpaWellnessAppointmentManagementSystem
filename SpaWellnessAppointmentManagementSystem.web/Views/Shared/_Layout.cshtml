@@ -1,29 +1,153 @@
-﻿@{
-    Layout = "_Layout";
-}
-
-<div class="container py-5">
-    <h1 class="display-4">Serenity Spa</h1>
-    <p class="lead">Bootstrap + Razor sanity test.</p>
-    <button id="toggleAuth" class="btn btn-primary">Toggle</button>
-</div>
-
-<script>
-    (function () {
-        var t = document.getElementById('toggleAuth');
-        if (t) {
-            t.addEventListener('click', function () {
-                alert('OK');
-            });
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] ✨ Serenity Spa</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+    @RenderSection("Styles", required: false)
+    <style>
+        /* Gradient for the Login/Register and Modal Login button */
+        .btn-gradient-spa {
+            background: linear-gradient(135deg, #9333ea, #ec4899);
+            color: white !important;
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
-    })();
-</script>
 
+        /* Add this to your CSS to disable browser swipe-to-navigate */
+        body {
+            overscroll-behavior-x: none;
+        }
 
+        .btn-gradient-spa:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+        }
 
+        /* Modal styling to match your screenshot */
+        .modal-content-spa {
+            border-radius: 15px;
+            border: none;
+        }
 
+        .modal-title-spa {
+            font-weight: 700;
+            color: #2d3748;
+        }
 
+        .form-label-spa {
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
 
+        .input-spa {
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            padding: 10px 15px;
+        }
+    </style>
+</head>
+@{
+                var currentUrl = Context.Request.Path.ToString().ToLower();
+                bool isCustomer = currentUrl.Contains("/dashboard/customer");
+                bool isAdmin = currentUrl.Contains("/dashboard/admin");
+                bool isStaff = currentUrl.Contains("/dashboard/staff");
 
+                string portalTitle = "Serenity Spa";
+                if (isAdmin) portalTitle += " - Admin Portal";
+                else if (isStaff) portalTitle += " - Staff Portal";
+                else if (isCustomer) portalTitle += " - Customer Portal";
+}
+<body class="bg-light-gradient">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <span class="me-2">✨</span>
+                <span class="brand-text">Serenity Spa</span>
+            </a>
+            <div class="ms-auto d-flex align-items-center">
+                @* Only show these if 'HideUserNav' is NOT set to true *@
+                @if (ViewData["HideUserNav"] == null || !(bool)ViewData["HideUserNav"])
+                {
+                    <span class="text-muted me-3 d-none d-md-block">Welcome, Customer</span>
 
+                    @* This check hiding the profile button if you are already on the customer dashboard *@
+                    @if (!isCustomer)
+                    {
+                        <a asp-controller="Dashboard" asp-action="Customer" class="btn btn-outline-dark me-2" id="btnProfile">
+                            👤 Profile
+                        </a>
+                    }
 
+                    <a asp-controller="Booking" asp-action="Index" class="btn btn-gradient me-2 d-none" id="btnBookService">
+                        Book Service
+                    </a>
+
+                    <a asp-controller="Dashboard" asp-action="Logout" class="btn btn-outline-danger btn-sm">
+                        Logout
+                    </a>
+                }
+                else
+                {
+                    @* Optional: Add a 'Back to Home' or Login button for About/Contact pages *@
+                    <a href="/" class="btn btn-sm btn-outline-secondary">Home</a>
+                }
+            </div>
+    </nav>
+
+    <main role="main" class="fade-in">
+        <div class="container mt-4">
+            @RenderBody()
+        </div>
+    </main>
+
+    <footer class="footer mt-auto py-3 bg-transparent text-center border-top">
+        <div class="container">
+            <span class="text-muted small">© 2025 - <span class="text-purple fw-bold">Serenity Spa</span> - Relax & Rejuvenate</span>
+        </div>
+    </footer>
+
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+            <div class="modal-content modal-content-spa shadow-lg">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title modal-title-spa" id="loginModalLabel">Welcome Back</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    @* This form redirects to the Customer Dashboard upon submission *@
+                    <form asp-controller="Dashboard" asp-action="Customer" method="get">
+                        <div class="mb-3">
+                            <label class="form-label-spa">
+                                <span>📧</span> Email
+                            </label>
+                            <input type="email" name="email" class="form-control input-spa" placeholder="Enter your email" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label-spa">
+                                <span>🔒</span> Password
+                            </label>
+                            <input type="password" name="password" class="form-control input-spa" placeholder="Enter your password" required>
+                        </div>
+                        <button type="submit" class="btn btn-gradient-spa w-100 py-2 fs-5 rounded-3">
+                            Login
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

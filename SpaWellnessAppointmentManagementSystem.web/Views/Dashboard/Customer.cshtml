@@ -1,8 +1,142 @@
-﻿@{
-    Layout = "_Layout";
-}
-<div class="container py-5">
-    <h2 class="fw-bold mb-4">Customer Profile</h2>
-    <p class="text-muted">Welcome back! View your bookings and wellness plans.</p>
-</div>
+﻿@using SpaWellnessAppointmentManagementSystem.Repo
+@model IEnumerable<SpaWellnessAppointmentManagementSystem.Repo.Appointment>
+@{
+    ViewData["Title"] = "Customer Dashboard";
+    Layout = null;
 
+    // FIX 1: Define the variables that were causing "does not exist" errors
+    var user = ViewBag.User;
+    var displayName = user?.Username ?? "Customer";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-purple: #9333ea;
+        }
+
+        body {
+            background: linear-gradient(135deg, #fdf2f8 0%, #f3e8ff 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .navbar {
+            background: white !important;
+            border-bottom: 2px solid #f3e8ff;
+        }
+
+        .brand-text {
+            font-weight: 700;
+            color: var(--primary-purple);
+        }
+
+        .card {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .profile-circle {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-purple);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto;
+        }
+
+        .schedule-card {
+            border-left: 5px solid var(--primary-purple);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg sticky-top mb-4">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <span class="me-2">✨</span><span class="brand-text">Serenity Spa - Customer Portal</span>
+            </a>
+            <div class="ms-auto d-flex align-items-center gap-3">
+                <span class="text-muted">Welcome, <strong>@displayName</strong></span>
+                <a href="/Dashboard/Logout" class="btn btn-outline-danger btn-sm"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid px-4">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="card p-4 text-center mb-4">
+                    <div class="mb-3">
+                        <div class="profile-circle">@displayName.Substring(0, 1).ToUpper()</div>
+                    </div>
+                    <h5 class="fw-bold mb-1">@displayName</h5>
+                    <p class="text-muted small">Valued Member</p>
+                    <hr />
+                    <a href="/Booking/Index" class="btn btn-primary w-100">Book New Session</a>
+                </div>
+            </div>
+
+            <div class="col-lg-9">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold mb-0">My Appointments</h3>
+                    <h6 class="fw-bold text-muted">@DateTime.Now.ToString("MMMM dd, yyyy")</h6>
+                </div>
+
+                <div class="tab-content">
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var appt in Model)
+                        {
+                            <div class="card p-4 mb-3 schedule-card">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <h5 class="fw-bold mb-0 me-3">@appt.ServiceName</h5>
+                                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">@appt.Status</span>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-sm-6">
+                                                <p class="mb-0 small text-muted">Therapist</p>
+                                                <p class="fw-bold mb-0">@appt.Therapist</p>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <p class="mb-0 small text-muted">Date & Time</p>
+                                                <p class="fw-bold mb-0">@appt.AppointmentDate.ToShortDateString() at @appt.SelectedTime</p>
+                                            </div>
+                                        </div>
+                                        <p class="small text-muted mb-0">Reference: #@appt.ReferenceNumber</p>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <button class="btn btn-outline-secondary btn-sm">View Details</button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="card p-5 text-center text-muted">
+                            <i class="fas fa-calendar-times fa-3x mb-3 opacity-25"></i>
+                            <p>You have no appointments scheduled.</p>
+                            <a href="/Booking/Index" class="btn btn-outline-primary btn-sm mx-auto" style="max-width: 200px;">Book Now</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Mvc;
 
 namespace SerenitySpa.Controllers
@@ -8,6 +7,19 @@ namespace SerenitySpa.Controllers
         public IActionResult Index() => View();
 
         public IActionResult Services() => View();
+
+        // Add this for /Home/About
+        public IActionResult About()
+        {
+            return View();
+        }
+
+        // Add this for /Home/Contact
+        public IActionResult Contact()
+        {
+            return View();
+        }
+
     }
 }
 

@@ -1,0 +1,445 @@
+﻿@* Booking.cshtml *@
+@{
+    ViewData["Title"] = "Booking Confirmation";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+    <style>
+        /* Existing Styles ... */
+        .step-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            border: 2px solid #dee2e6;
+            background: white;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+        }
+
+            .step-circle.active {
+                border-color: #9333ea;
+                background: #fdf4ff;
+                color: #9333ea;
+            }
+
+            .step-circle.completed {
+                background-color: #9333ea !important;
+                color: white !important;
+                border-color: #9333ea !important;
+            }
+
+        .step-line {
+            height: 2px;
+            width: 60px;
+            background: #dee2e6;
+            margin: 0 10px;
+        }
+
+            .step-line.active {
+                background: #9333ea;
+            }
+
+        .btn-booking {
+            background: linear-gradient(135deg, #c084fc, #f472b6);
+            color: white;
+            border: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+            .btn-booking:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(244, 114, 182, 0.4);
+                color: white;
+            }
+
+        /* New Payment Selection Styles */
+        .payment-option-card {
+            cursor: pointer;
+            border: 2px solid #f3f4f6;
+            transition: all 0.2s;
+        }
+
+            .payment-option-card.selected {
+                border-color: #9333ea;
+                background-color: #fdf4ff;
+            }
+
+            .payment-option-card:hover {
+                border-color: #d8b4fe;
+            }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: #fdf4ff;
+            color: #9333ea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin: 0 auto;
+            border: 2px solid #9333ea;
+        }
+
+        .fail-icon {
+            width: 80px;
+            height: 80px;
+            background: #fef2f2;
+            color: #ef4444;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin: 0 auto;
+            border: 2px solid #ef4444;
+        }
+
+    </style>
+}
+
+<div class="container py-5">
+    @* --- STEPPER SECTION (Hidden on failure screen) --- *@
+    @if (ViewBag.IsFailed != true)
+    {
+        <div class="mb-5" id="stepperSection">
+            <div class="row justify-content-center">
+                <div class="col-auto">
+                    <div class="d-flex align-items-center">
+                        <div class="text-center">
+                            <div class="step-circle @(ViewBag.IsSuccess == true ? "completed" : "active")" id="step1Circle">
+                                @(ViewBag.IsSuccess == true ? "✓" : "📅")
+                            </div>
+                            <div class="small fw-bold mt-2">Details</div>
+                        </div>
+                        <div class="step-line @(ViewBag.IsSuccess == true ? "active" : "")" id="line1"></div>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="text-center">
+                        <div class="step-circle @(ViewBag.IsSuccess == true ? "completed" : "")" id="step2Circle">
+                            @(ViewBag.IsSuccess == true ? "✓" : "💳")
+                        </div>
+                        <div class="small @(ViewBag.IsSuccess == true ? "fw-bold" : "text-muted") mt-2" id="step2Label">Payment</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            @if (ViewBag.IsSuccess == true)
+            {
+                @* --- SUCCESS SCREEN (Fixed Duplication) --- *@
+                <div class="card border-0 shadow-sm text-center p-5" id="successScreen">
+                    <div class="success-icon mb-4">✨</div>
+                    <h2 class="fw-bold mb-2">Booking Confirmed!</h2>
+                    <p class="text-muted mb-4">Your relaxation journey is scheduled. Reference: <strong>@ViewBag.ReferenceNumber</strong></p>
+
+                    <div class="d-flex justify-content-center gap-3">
+                        @* Changed to a simple link that opens the Print-Friendly Receipt in a new tab *@
+                        <a href="@Url.Action("PrintReceipt", "Booking", new { reference = ViewBag.ReferenceNumber })"
+                           target="_blank"
+                           class="btn btn-outline-primary px-4 py-2">
+                            📥 Download PDF Receipt
+                        </a>
+
+                        <a href="@Url.Action("Customer", "Dashboard")" class="btn btn-booking px-5 py-2">Go to My Dashboard</a>
+                    </div>
+                </div>
+            }
+            else if (ViewBag.IsFailed == true)
+            {
+                @* --- PAYMENT FAILED SCREEN (Requirement 4) --- *@
+                <div class="card border-0 shadow-sm text-center p-5" id="failScreen">
+                    <div class="fail-icon mb-4">❌</div>
+                    <h2 class="fw-bold mb-2">Payment Failed</h2>
+                    <p class="text-muted mb-4">There was an issue processing your payment. Please try booking again.</p>
+                    <a href="@Url.Action("Index", "Booking")" class="btn btn-booking px-5 py-2">Book from Start</a>
+                </div>
+            }
+            else
+            {
+                @* --- STEP 1: REVIEW & STEP 2: PAYMENT --- *@
+                <div class="card border-0 shadow-sm" id="step1">
+                    <div class="card-body p-4">
+                        <h4 class="fw-bold mb-4">Review Your Appointment</h4>
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">Service Selected</h6>
+                            <div class="bg-light p-3 rounded">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong style="color: #9333ea;">@ViewBag.ServiceName</strong>
+                                        <div class="text-muted small">@ViewBag.Category</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <strong>₹@ViewBag.TotalPrice.ToString("F2")</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold small">📅 Selected Date</label>
+                                <input type="text" class="form-control bg-white" value="@ViewBag.AppointmentDate" readonly>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold small">🕐 Selected Time</label>
+                                <input type="text" class="form-control bg-white" value="@ViewBag.SelectedTime" readonly>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small">👤 Selected Specialist</label>
+                            <input type="text" class="form-control bg-white" value="@ViewBag.Therapist" readonly>
+                        </div>
+                        <button class="btn btn-booking btn-lg w-100 py-3" onclick="goToStep2()">Continue to Payment</button>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm" id="step2" style="display:none;">
+                    <div class="card-body p-4">
+                        <h4 class="fw-bold mb-4">Payment</h4>
+                        <div class="border rounded-3 p-3 mb-4 bg-light">
+                            <h6 class="fw-bold text-muted small text-uppercase mb-3">Booking Summary</h6>
+                            <div class="d-flex justify-content-between mb-2 small">
+                                <span>Service Fee:</span>
+                                <span>₹@ViewBag.TotalPrice.ToString("F2")</span>
+                            </div>
+                            <hr />
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="h6 mb-0">Total Amount:</span>
+                                <span class="h5 mb-0 fw-bold text-success">₹@ViewBag.TotalPrice.ToString("F2")</span>
+                            </div>
+                        </div>
+                        @* Form Submission now handled by JavaScript to implement client-side validation requirements *@
+                        <form asp-controller="Booking" asp-action="CompleteBooking" method="post" id="finalBookingForm">
+                            @* Hidden Inputs for Appointment Data *@
+                            <input type="hidden" name="serviceName" value="@ViewBag.ServiceName" />
+                            <input type="hidden" name="category" value="@ViewBag.Category" />
+                            <input type="hidden" name="appointmentDate" value="@ViewBag.AppointmentDate" />
+                            <input type="hidden" name="selectedTime" value="@ViewBag.SelectedTime" />
+                            <input type="hidden" name="therapist" value="@ViewBag.Therapist" />
+                            <input type="hidden" name="totalPrice" value="@ViewBag.TotalPrice" />
+                            <h6 class="fw-bold mb-3">Select Payment Method</h6>
+                            @* Payment Method Selection Box *@
+                            <div class="row g-2 mb-4">
+                                <div class="col-12">
+                                    <div class="p-3 border rounded payment-option-card selected" id="optCard" onclick="selectMethod('card')">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="paymentMethod" value="card" id="radCard" checked>
+                                            <label class="form-check-label fw-bold" for="radCard">💳 Credit / Debit Card</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="p-3 border rounded payment-option-card" id="optUPI" onclick="selectMethod('upi')">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="paymentMethod" value="upi" id="radUPI">
+                                            <label class="form-check-label fw-bold" for="radUPI">📱 UPI (GPay / PhonePe / BHIM)</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @* Card Details Section (Requires updated input fields for validation hooks) *@
+                            <div id="cardDetailsSection">
+                                <div class="mb-3">
+                                    <label class="small fw-bold text-muted mb-1">Card Number</label>
+                                    <input type="text" name="cardNumber" id="cardNumber" class="form-control" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                                    <div class="invalid-feedback">
+                                        Please enter a valid 16-digit card number.
+                                    </div>
+                                </div>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-6">
+                                        <label class="small fw-bold text-muted mb-1">Expiry Date (MM/YY)</label>
+                                        <input type="text" name="expiryDate" id="expiryDate" class="form-control" placeholder="MM/YY" maxlength="5" required>
+                                        <div class="invalid-feedback">
+                                            Invalid or expired date (MM/YY).
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="small fw-bold text-muted mb-1">CVV</label>
+                                        <input type="password" name="cvv" id="cvv" class="form-control" placeholder="123" maxlength="3" required>
+                                        <div class="invalid-feedback">
+                                            CVV must be 3 digits.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @* UPI Details Section *@
+                            <div id="upiDetailsSection" style="display:none;">
+                                <div class="mb-4">
+                                    <label class="small fw-bold text-muted mb-1">Enter UPI ID</label>
+                                    <input type="text" name="upiId" id="upiId" class="form-control" placeholder="example@okaxis">
+                                    <p class="text-muted mt-2 small">A payment request will be sent to your UPI app.</p>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-outline-secondary px-4" onclick="goToStep1()">Back</button>
+                                <button type="submit" id="payButton" class="btn flex-grow-1 py-2 fw-bold text-white" style="background-color: #22c55e; border: none;">
+                                    Pay Now
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // --- Stepper Functions (Existing) ---
+        function goToStep2() {
+            $('#step1').hide();
+            $('#step2').fadeIn();
+            $('#step1Circle').html('✓').addClass('completed');
+            $('#line1, #step2Circle').addClass('active');
+            $('#step2Label').removeClass('text-muted').addClass('fw-bold');
+            window.scrollTo(0, 0);
+        }
+
+        function goToStep1() {
+            $('#step2').hide();
+            $('#step1').fadeIn();
+            $('#step1Circle').html('📅').removeClass('completed');
+            $('#line1, #step2Circle').removeClass('active');
+            $('#step2Label').addClass('text-muted').removeClass('fw-bold');
+        }
+
+        // --- Payment Method Selection (Existing, updated to manage required attrs) ---
+        function selectMethod(method) {
+            $('.payment-option-card').removeClass('selected');
+            if (method === 'card') {
+                $('#optCard').addClass('selected');
+                $('#radCard').prop('checked', true);
+                $('#cardDetailsSection').show();
+                $('#upiDetailsSection').hide();
+                // Toggle required fields
+                $('#cardNumber, #expiryDate, #cvv').attr('required', true);
+                $('#upiId').attr('required', false);
+            } else {
+                $('#optUPI').addClass('selected');
+                $('#radUPI').prop('checked', true);
+                $('#cardDetailsSection').hide();
+                $('#upiDetailsSection').show();
+                // Toggle required fields
+                $('#upiId').attr('required', true);
+                $('#cardNumber, #expiryDate, #cvv').attr('required', false);
+            }
+        }
+
+        // Ensure initial state sets required attributes for 'card'
+        $(document).ready(function() {
+             selectMethod('card');
+        });
+
+
+        // --- New Validation Logic (Requirements 1, 2, 3, 4) ---
+
+        // 1. Card Number Formatting and Validation (16 digits, auto-space)
+        $('#cardNumber').on('input', function() {
+            let input = $(this).val().replace(/\D/g, ''); // Remove non-digits
+            let formattedInput = input.match(/.{1,4}/g); // Split into groups of 4
+            if (formattedInput) {
+                $(this).val(formattedInput.join(' '));
+            } else {
+                $(this).val('');
+            }
+        });
+
+        // 2. Expiry Date Formatting and Validation (MM/YY, not expired)
+        $('#expiryDate').on('input', function() {
+            let input = $(this).val().replace(/\D/g, ''); // Remove non-digits
+            if (input.length > 2) {
+                input = input.substring(0, 2) + '/' + input.substring(2, 4);
+            }
+            $(this).val(input);
+        });
+
+        function isValidExpiryDate(expiryDateStr) {
+            const parts = expiryDateStr.split('/');
+            if (parts.length !== 2 || parts[0].length !== 2 || parts[1].length !== 2) return false;
+
+            const month = parseInt(parts[0], 10);
+            const year = parseInt(parts[1], 10) + 2000; // Assuming YY format is 20YY
+
+            if (month < 1 || month > 12) return false;
+
+            const today = new Date();
+            const expiry = new Date(year, month - 1, 1); // Month is 0-indexed in JS Date
+
+            // Check if the first day of the expiry month is in the future or current month
+            // We set the expiry date to the last day of the month for more accurate check
+            const lastDayOfExpiryMonth = new Date(year, month, 0);
+
+            // Compare just dates (ignore time)
+            // Add a slight tolerance, comparing the last day of the expiry month with today's date
+            return lastDayOfExpiryMonth >= today;
+        }
+
+        // 3. CVV Validation (3 digits) - Handled by input type="password" and maxlength="3" in HTML, but can add JS check for completeness
+
+        // 4. Form Submission Handler with custom validation and "000...0" check
+        $('#finalBookingForm').on('submit', function(event) {
+            event.preventDefault(); // Stop the default form submission
+
+            const form = $(this);
+            const paymentMethod = $('input[name="paymentMethod"]:checked').val();
+            let isValid = true;
+
+            // Reset custom validity states
+            $('.form-control').removeClass('is-invalid');
+
+            if (paymentMethod === 'card') {
+                const cardNumberInput = $('#cardNumber');
+                const expiryDateInput = $('#expiryDate');
+                const cvvInput = $('#cvv');
+
+                // Check Card Number Regex (16 digits, ignore spaces for logic)
+                const rawCardNum = cardNumberInput.val().replace(/\s/g, '');
+                if (!/^\d{16}$/.test(rawCardNum)) {
+                    cardNumberInput.addClass('is-invalid');
+                    isValid = false;
+                }
+
+                // Requirement 4: Check if all 16 digits are 0
+                if (rawCardNum.length === 16 && /^(\d)\1+$/.test(rawCardNum)) {
+                    // Option A: Submit to controller but tell it to fail
+                    $('<input>').attr({type: 'hidden', name: 'isFailed', value: 'true'}).appendTo(form);
+                    form.unbind('submit').submit();
+                    return;
+                }
+
+                // Check Expiry Date
+                if (!isValidExpiryDate(expiryDateInput.val())) {
+                    expiryDateInput.addClass('is-invalid');
+                    isValid = false;
+                }
+
+                // Check CVV (only numbers, 3 digits)
+                if (!/^\d{3}$/.test(cvvInput.val())) {
+                    cvvInput.addClass('is-invalid');
+                    isValid = false;
+                }
+            } else if (paymentMethod === 'upi') {
+                 // UPI validation can be added here if needed, currently relies on 'required' attribute
+            }
+
+            if (isValid) {
+                // If all client-side checks pass, proceed with the actual form submission
+                $('#payButton').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Processing...');
+                form.unbind('submit').submit(); // Unbind the handler and resubmit the form normally
+            }
+        });
+    </script>
+}

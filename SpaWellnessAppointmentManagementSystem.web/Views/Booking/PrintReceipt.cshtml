@@ -1,0 +1,80 @@
+﻿@model SpaWellnessAppointmentManagementSystem.Repo.Appointment
+@{
+    Layout = null; // No header/footer for the receipt
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Receipt - @Model.ReferenceNumber</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            padding: 50px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .receipt-border {
+            border: 2px solid #f0f0f0;
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        .spa-logo {
+            color: #9333ea;
+            font-weight: bold;
+            font-size: 24px;
+        }
+         @@media print {
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container receipt-border">
+        <div class="d-flex justify-content-between mb-4">
+            <div class="spa-logo">✨ Serenity Spa</div>
+            <div class="text-end text-muted small">Date: @DateTime.Now.ToString("dd MMM yyyy")</div>
+        </div>
+
+        <h4 class="mb-4">Official Receipt</h4>
+        <table class="table table-borderless">
+            <tr>
+                <td class="text-muted">Reference:</td>
+                <td class="fw-bold">@Model.ReferenceNumber</td>
+            </tr>
+            <tr>
+                <td class="text-muted">Service:</td>
+                <td>@Model.ServiceName</td>
+            </tr>
+            <tr>
+                <td class="text-muted">Appointment:</td>
+                <td>@Model.AppointmentDate.ToShortDateString() at @Model.SelectedTime</td>
+            </tr>
+            <tr>
+                <td class="text-muted">Specialist:</td>
+                <td>@Model.Therapist</td>
+            </tr>
+        </table>
+
+        <hr />
+        <div class="d-flex justify-content-between p-2 bg-light">
+            <span class="fw-bold">Total Amount Paid:</span>
+            <span class="fw-bold text-success">₹@Model.TotalPrice.ToString("F2")</span>
+        </div>
+
+        <div class="mt-5 text-center small text-muted">
+            Thank you for your business!<br />
+            Serenity Spa & Wellness Center
+        </div>
+    </div>
+
+    <script>
+        // Automatically trigger the print/PDF dialog when the page loads
+        window.onload = function() {
+            window.print();
+        }
+    </script>
+</body>
+</html>

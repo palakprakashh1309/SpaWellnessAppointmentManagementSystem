@@ -1,0 +1,278 @@
+﻿@model IEnumerable<SpaWellnessAppointmentManagementSystem.Repo.Models.SpaService>
+
+<style>
+    /* 1. Layout & Hero Styling */
+    .hero-section {
+        background: #ffffff;
+        padding: 60px 0 100px 0;
+        margin-top: 10px;
+        border-radius: 12px;
+        /* Removed text-align: center to allow left alignment of the button */
+    }
+
+    #btnReset {
+        border-radius: 8px;
+        padding: 8px 20px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+        #btnReset:hover {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            border-color: #6c757d;
+        }
+
+    .back-btn {
+        
+        border: none;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        border-radius: 8px;
+        padding: 8px 16px;
+        text-decoration: none;
+        color: #000000;
+        font-size: 14px;
+        display: inline-block; /* Ensures it respects alignment */
+    }
+
+    /* 2. The Floating Filter Bar */
+    .filter-bar {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        margin-top: 10px;
+        position: relative;
+        z-index: 100;
+    }
+
+        .filter-bar input, .filter-bar select {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            height: 45px;
+        }
+
+    /* Fix for Search Icon Alignment */
+    .search-wrapper {
+        position: relative;
+    }
+
+        .search-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .search-wrapper input {
+            padding-left: 45px !important; /* Space for the icon */
+        }
+
+    /* 3. Card Design */
+    .service-card {
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+        background: white;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+        }
+
+    .card-gradient-header {
+        height: 180px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .card-gradient-header span {
+            font-size: 70px;
+        }
+
+    .btn-book {
+        background: #d63384;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 12px;
+        font-weight: 600;
+        width: 100%;
+    }
+</style>
+<div class="row mb-3">
+    <div class="col-12">
+        @* Changed asp-controller to "Home" to reach the main landing page *@
+        <a asp-controller="Home" asp-action="Index" class="btn btn-link text-decoration-none text-dark fw-bold p-0">
+            <span class="me-2">←</span> Back to Home
+        </a>
+    </div>
+</div>
+<div class="hero-section">
+    <div class="container">
+        
+
+        <div class="text-center mt-4">
+            <h1 class="display-4 fw-bold">Our Services</h1>
+            <p class="text-muted lead">Choose from our wide range of premium spa and wellness treatments</p>
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="filter-bar mb-5">
+        <div class="row g-2 align-items-center">
+            @* g-2 for tighter spacing *@
+            <div class="col-md-3">
+                <div class="search-wrapper">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search...">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <select id="catFilter" class="form-select">
+                    <option value="All">All Categories</option>
+                    <option value="Massage Therapy">Massage</option>
+                    <option value="Facial Treatments">Facials</option>
+                    <option value="Body Treatments">Body</option>
+                    <option value="Wellness Programs">Wellness</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select id="priceFilter" class="form-select">
+                    <option value="All">All Prices</option>
+                    <option value="0-100">Under Rs 100</option>
+                    <option value="101-150">Rs 101-150</option>
+                    <option value="151-500">Over Rs 150</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select id="durFilter" class="form-select">
+                    <option value="All">All Durations</option>
+                    <option value="0-60">60 min or less</option>
+                    <option value="61-120">Over 60 min</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="button" id="btnReset" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                </button>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <div class="text-start mb-4">
+        <p>Showing <span id="resCount" class="fw-bold">0</span> service(s)</p>
+    </div>
+
+    <div id="servicesGrid" class="row g-4">
+    </div>
+</div>
+
+<script>
+    const allServices = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));
+
+    function render(list) {
+        const grid = document.getElementById('servicesGrid');
+        grid.innerHTML = '';
+        document.getElementById('resCount').innerText = list.length;
+
+        list.forEach(s => {
+            const gradients = ['#8e2de2, #f000b8', '#2193b0, #6dd5ed', '#f7971e, #ffd200', '#00b09b, #96c93d'];
+            const grad = gradients[s.Id % gradients.length];
+
+               grid.innerHTML += `
+        <div class="col-md-4">
+            <div class="card service-card shadow-sm h-100">
+                <div class="card-gradient-header" style="background: linear-gradient(135deg, ${grad})">
+                    <span>${s.Icon}</span>
+                </div>
+                <div class="card-body p-4 d-flex flex-column"> @* Added flex column for height alignment *@
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="fw-bold mb-0">${s.Name}</h5>
+                        <span class="badge ${s.IsAvailable ? 'bg-success' : 'bg-secondary'} px-3">
+                            ${s.IsAvailable ? 'Available' : 'Unavailable'}
+                        </span>
+                    </div>
+                    <p class="text-muted small mb-1">${s.Category}</p>
+
+                    @* --- NEW: Clamped Description Line --- *@
+                    <p class="text-muted mb-3" style="font-size: 0.85rem; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;">
+                        ${s.Description || 'Relax and rejuvenate with our professional treatment.'}
+                    </p>
+
+                    <div class="d-flex justify-content-between mt-auto pt-3 border-top"> @* Added mt-auto to push bottom section down *@
+                        <span class="text-muted small"><i class="bi bi-clock"></i> ${s.Duration} min</span>
+                        <span class="fw-bold text-primary">Rs ${s.Price}</span>
+                    </div>
+
+                    <a href="/Booking/Details/${s.Id}" class="btn btn-book mt-3 ${s.IsAvailable ? '' : 'disabled'}"
+                       style="${s.IsAvailable ? '' : 'background-color: #6c757d; border-color: #6c757d;'}">
+                        ${s.IsAvailable ? 'Book Now' : 'Fully Booked'}
+                    </a>
+                </div>
+            </div>
+        </div>
+            `;
+        });
+    }
+
+    function applyFilters() {
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        const cat = document.getElementById('catFilter').value;
+        const priceRange = document.getElementById('priceFilter').value;
+        const durRange = document.getElementById('durFilter').value;
+
+        const filtered = allServices.filter(s => {
+            const matchesSearch = s.Name.toLowerCase().includes(search);
+            const matchesCat = cat === 'All' || s.Category === cat;
+
+            let matchesPrice = true;
+            if (priceRange !== 'All') {
+                const [min, max] = priceRange.split('-').map(Number);
+                matchesPrice = s.Price >= min && s.Price <= max;
+            }
+
+            let matchesDur = true;
+            if (durRange !== 'All') {
+                const [min, max] = durRange.split('-').map(Number);
+                matchesDur = s.Duration >= min && s.Duration <= max;
+            }
+
+            return matchesSearch && matchesCat && matchesPrice && matchesDur;
+        });
+
+        render(filtered);
+    }
+
+    document.querySelectorAll('.filter-bar input, .filter-bar select').forEach(el => {
+        el.addEventListener('input', applyFilters);
+    });
+
+        // Add this inside your existing <script> tag
+    document.getElementById('btnReset').addEventListener('click', function() {
+        // 1. Reset all input values to default
+        document.getElementById('searchInput').value = '';
+        document.getElementById('catFilter').value = 'All';
+        document.getElementById('priceFilter').value = 'All';
+        document.getElementById('durFilter').value = 'All';
+
+        // 2. Re-render the full list
+        render(allServices);
+
+        // 3. Optional: Add a subtle fade-in effect to the grid
+        const grid = document.getElementById('servicesGrid');
+        grid.style.opacity = '0';
+        setTimeout(() => {
+            grid.style.transition = 'opacity 0.5s';
+            grid.style.opacity = '1';
+        }, 50);
+    });
+
+    render(allServices);
+</script>

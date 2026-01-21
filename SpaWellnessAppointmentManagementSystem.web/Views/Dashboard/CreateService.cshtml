@@ -1,0 +1,98 @@
+﻿@model SpaWellnessAppointmentManagementSystem.Repo.Models.SpaService
+<style>
+    option[value="bg-gradient-purple"] {
+        border-left: 10px solid #6f42c1;
+    }
+
+    option[value="bg-gradient-blue"] {
+        border-left: 10px solid #0d6efd;
+    }
+
+    option[value="bg-gradient-orange"] {
+        border-left: 10px solid #fd7e14;
+    }
+
+    option[value="bg-gradient-pink"] {
+        border-left: 10px solid #d63384;
+    }
+</style>
+<div class="container py-5">
+    <div class="card shadow-sm border-0 px-4 py-4">
+        <h2 class="mb-4 text-dark">Add New Spa Service</h2>
+        <hr />
+
+        <form asp-controller="Dashboard" asp-action="SaveService" method="post">
+            <div class="row">   
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Name" class="form-label fw-bold">Service Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="e.g. Deep Tissue Massage" required />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Category" class="form-label fw-bold">Category</label>
+                    <input asp-for="Category" class="form-control" placeholder="e.g. Massage Therapy" required />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <label asp-for="Icon" class="form-label fw-bold">Icon Class / URL</label>
+                    <input asp-for="Icon" class="form-control" placeholder="e.g. bi-scooter or emoji" />
+                    <small class="text-muted">You can use Bootstrap icon classes or a simple emoji.</small>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                   <label asp-for="Gradient" class="form-label fw-bold">Card Background Style</label>
+                    <select asp-for="Gradient" class="form-select" required>
+                        <option value="" disabled selected>-- Select a Color Theme --</option>
+                        <option value="bg-gradient-purple">Purple Breeze (Relaxation)</option>
+                        <option value="bg-gradient-blue">Deep Sea Blue (Therapeutic)</option>
+                        <option value="bg-gradient-orange">Sunset Orange (Invigorating)</option>
+                        <option value="bg-gradient-pink">Floral Pink (Aromatherapy)</option>
+                        <option value="bg-gradient-cyan">Crystal Cyan (Rejuvenating)</option>
+                        <option value="bg-gradient-teal">Fresh Teal (Purifying)</option>
+                        <option value="bg-gradient-green">Organic Green (Natural)</option>
+                        <option value="bg-gradient-indigo">Midnight Indigo (Meditation)</option>
+                    </select> 
+                    <small class="text-muted">This color will be used for the service card on the home page.</small>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Price" class="form-label fw-bold">Price (Rs)</label>
+                    <div class="input-group">
+                        <span class="input-group-text">Rs</span>
+                        <input asp-for="Price" type="number" step="0.01" class="form-control" required />
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Duration" class="form-label fw-bold">Duration (min)</label>
+                    <input asp-for="Duration" class="form-control" placeholder="e.g. 60" required />
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Description" class="form-label fw-bold">Description</label>
+                <textarea asp-for="Description" class="form-control" rows="3" placeholder="Describe the service benefits..."></textarea>
+            </div>
+            <div class="mb-4">
+               <label asp-for="WhatToExpect" class="form-label fw-bold">What to Expect During Session</label>
+                <textarea asp-for="WhatToExpect" class="form-control" rows="3"
+                          placeholder="Point 1; Point 2; Point 3; Point 4"></textarea> 
+                <small class="text-muted">
+                    <i class="bi bi-info-circle"></i> Separate each point with a <b>semicolon (;)</b> to display them as bullet points.
+                </small>
+            </div>
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary px-4 me-2">
+                    <i class="bi bi-save"></i> Save Service
+                </button>
+                <a asp-controller="Dashboard" asp-action="Admin" class="btn btn-outline-secondary px-4">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>

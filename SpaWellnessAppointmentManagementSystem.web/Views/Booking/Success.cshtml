@@ -1,0 +1,13 @@
+﻿@model SpaWellnessAppointmentManagementSystem.Repo.Appointment
+
+<div class="container text-center py-5">
+    <div class="card shadow p-5">
+        <h1 class="text-success">Booking Confirmed!</h1>
+        <p>Thank you for choosing Serenity Spa.</p>
+        <hr />
+        <h3>Reference Number: <strong>@Model.ReferenceNumber</strong></h3>
+        <p>Service: @Model.ServiceName</p>
+        <p>Date: @Model.AppointmentDate.ToShortDateString() at @Model.SelectedTime</p>
+        <a href="/" class="btn btn-primary mt-3">Return Home</a>
+    </div>
+</div>

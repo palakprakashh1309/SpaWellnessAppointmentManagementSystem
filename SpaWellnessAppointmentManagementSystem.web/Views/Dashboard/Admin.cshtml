@@ -1,8 +1,717 @@
 ﻿@{
-    Layout = "_Layout";
+    Layout = null;
 }
-<div class="container py-5">
-    <h2 class="fw-bold mb-4 text-purple">Admin Dashboard</h2>
-    <p class="text-muted">Manage staff, schedules, and system settings.</p>
-</div>
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Serenity Spa</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --spa-purple: #a855f7;
+            --spa-pink: #db2777;
+            --sidebar-width: 240px;
+        }
+
+        body {
+            background-color: #fdf2f8;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #334155;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            min-height: 100vh;
+            width: var(--sidebar-width);
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding-top: 20px;
+            background: white;
+            z-index: 1000;
+            border-right: 1px solid #fce7f3;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+        }
+
+        .logo-container {
+            padding: 0 25px 30px;
+        }
+
+        .logo-text {
+            color: var(--spa-purple);
+            font-weight: 700;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .nav-link {
+            color: #64748b;
+            padding: 12px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+            .nav-link:hover {
+                color: var(--spa-purple);
+                background: #fdf4ff;
+            }
+
+            .nav-link.active {
+                background: linear-gradient(90deg, #db2777, #a855f7) !important;
+                color: white !important;
+                border-radius: 0 50px 50px 0;
+                margin-right: 15px;
+            }
+
+        
+        .navbar {
+            margin-left: var(--sidebar-width);
+            background: white !important;
+            border-bottom: 1px solid #f1f5f9;
+            padding: 15px 30px;
+        }
+
+        .admin-portal-title {
+            color: var(--spa-pink);
+            font-weight: 700;
+            margin: 0;
+        }
+
+        
+        .kpi-card {
+            border-radius: 20px;
+            border: none;
+            overflow: hidden;
+        }
+
+        .bg-gradient-purple {
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+        }
+
+        .bg-gradient-blue {
+            background: linear-gradient(135deg, #3b82f6, #2dd4bf);
+        }
+
+        .bg-gradient-green {
+            background: linear-gradient(135deg, #10b981, #34d399);
+        }
+
+        .bg-gradient-orange {
+            background: linear-gradient(135deg, #f97316, #fbbf24);
+        }
+
+        .stat-icon {
+            background: rgba(255, 255, 255, 0.25);
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 1.4rem;
+            display: inline-flex;
+        }
+
+        .trend-badge {
+            background-color: white !important;
+            color: #334155 !important;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 8px;
+        }
+
+        .data-card {
+            background: white;
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+        }
+
+        .status-badge-confirmed, .status-badge-available, .status-badge-success, .status-badge-active {
+            background-color: #10b981;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .status-badge-busy, .status-badge-pending {
+            background-color: #fbbf24;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .btn-add-service {
+            background: linear-gradient(90deg, #db2777, #a855f7);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 20px;
+            font-weight: 600;
+        }
+
+        .btn-action {
+            border: 1px solid #f1f5f9;
+            background: white;
+            color: #64748b;
+            padding: 5px 10px;
+            border-radius: 8px;
+        }
+
+            .btn-action:hover {
+                background: #fdf4ff;
+                color: var(--spa-purple);
+            }
+
+        .btn-assign {
+            color: #3b82f6;
+            border: 1px solid #dbeafe;
+            background: #eff6ff;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .btn-cancel {
+            color: #ef4444;
+            border: 1px solid #fee2e2;
+            background: #fef2f2;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .staff-card {
+            background: white;
+            border-radius: 20px;
+            border: none;
+            text-align: center;
+            padding: 30px;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+        }
+
+            .staff-card:hover {
+                transform: translateY(-5px);
+            }
+
+        .staff-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fdf4ff, #fae8ff);
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            border: 2px solid #f5d0fe;
+        }
+
+        .rating-badge {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .progress {
+            height: 10px;
+            border-radius: 10px;
+            background-color: #f1f5f9;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #a855f7, #db2777);
+            border-radius: 10px;
+        }
+
+        .text-purple {
+            color: var(--spa-purple);
+        }
+
+        .content-section {
+            display: none;
+        }
+
+            .content-section.active-section {
+                display: block;
+            }
+
+        .search-container {
+            position: relative;
+            max-width: 300px;
+        }
+
+            .search-container i {
+                position: absolute;
+                left: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #94a3b8;
+            }
+
+            .search-container input {
+                padding-left: 35px;
+                border-radius: 10px;
+                border: 1px solid #e2e8f0;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar shadow-sm">
+        <div class="logo-container">
+            <a href="#" class="logo-text">
+                <span>✨</span> Serenity Spa
+            </a>
+        </div>
+        <nav class="nav flex-column" id="sidebarNav">
+            <a class="nav-link active" onclick="showSection('overview', this)"><i class="bi bi-grid-fill"></i> Overview</a>
+            <a class="nav-link" onclick="showSection('services', this)"><i class="bi bi-box-seam"></i> Services</a>
+            <a class="nav-link" onclick="showSection('appointments', this)"><i class="bi bi-calendar3"></i> Appointments</a>
+            <a class="nav-link" onclick="showSection('staff', this)"><i class="bi bi-people"></i> Staff</a>
+            <a class="nav-link" onclick="showSection('users', this)"><i class="bi bi-person"></i> Users</a>
+        </nav>
+    </div>
+
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid p-0">
+            <h5 class="admin-portal-title">Admin Portal</h5>
+            <div class="ms-auto d-flex align-items-center">
+                <span class="me-3 text-muted">Welcome, <strong>Admin</strong></span>
+                <a asp-controller="Dashboard" asp-action="Logout" class="btn btn-outline-danger btn-sm">
+                    Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+
+        <div id="overview-section" class="content-section active-section">
+            <div class="mb-4">
+                <h2 class="fw-bold">Dashboard Overview</h2>
+                <p class="text-muted">Welcome to your admin dashboard</p>
+            </div>
+
+            <div class="row g-4 mb-5">
+                <div class="col-md-3">
+                    <div class="card kpi-card bg-gradient-purple text-white shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start"><span class="stat-icon">📅</span></div>
+                            <h2 class="mt-3 fw-bold">@ViewBag.TotalBookings</h2>
+                            <p class="mb-0 opacity-75">Total Bookings</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card kpi-card bg-gradient-blue text-white shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start"><span class="stat-icon">💰</span></div>
+                            <h2 class="mt-3 fw-bold">Rs @(string.Format("{0:N0}", ViewBag.TotalRevenue))</h2>
+                            <p class="mb-0 opacity-75">Revenue</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card kpi-card bg-gradient-green text-white shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start"><span class="stat-icon">👥</span></div>
+                            <h2 class="mt-3 fw-bold">@ViewBag.ActiveCustomers</h2>
+                            <p class="mb-0 opacity-75">Active Customers</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-12">
+                    <div class="card data-card shadow-sm">
+                        <div class="card-header bg-white border-0 p-4"><h5 class="fw-bold mb-0">Latest Appointments</h5></div>
+                        <div class="card-body p-0">
+                            <table class="table align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr><th class="ps-4">ID</th><th>Customer</th><th>Service</th><th>Date</th><th class="pe-4 text-center">Status</th></tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.LatestAppointments != null)
+                                    {
+                                        foreach (var appt in ViewBag.LatestAppointments)
+                                        {
+                                            <tr>
+                                                <td class="ps-4 fw-medium">@appt.ReferenceNumber</td>
+                                                <td>@appt.CustomerName</td>
+                                                <td>@appt.ServiceName</td>
+                                                <td>@appt.RawDate.ToString("yyyy-MM-dd")</td>
+                                                <td class="pe-4 text-center">
+                                                    <span class="@(appt.Status == "CONFIRMED" ? "status-badge-confirmed" : "badge bg-danger")">
+                                                        @appt.Status
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="services-section" class="content-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold">Service Management</h2>
+                    <p class="text-muted">Manage your spa services</p>
+                </div>
+                <a asp-controller="Dashboard" asp-action="CreateService" class="btn btn-add-service">
+                    <i class="bi bi-plus-lg"></i> Add Service
+                </a>
+            </div>
+
+            <div class="card data-card shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">ID</th>
+                                    <th>Service Name</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Duration</th>
+                                    <th>Status</th>
+                                    <th class="pe-4 text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ViewBag.AllServices != null)
+                                {
+                                    @foreach (var service in (IEnumerable<SpaWellnessAppointmentManagementSystem.Repo.Models.SpaService>)ViewBag.AllServices)
+                                    {
+                                        <tr>
+                                            <td class="ps-4">@service.Id</td>
+                                            <td class="fw-bold">@service.Name</td>
+                                            <td>@service.Category</td>
+                                            <td>Rs @service.Price</td>
+                                            <td>@service.Duration min</td>
+                                            <td>
+                                                @* DYNAMIC TOGGLE BUTTON *@
+                                                <form asp-controller="Dashboard" asp-action="ToggleStatus" asp-route-id="@service.Id" method="post">
+                                                    @if (service.IsAvailable)
+                                                    {
+                                                        <button type="submit" class="btn btn-sm btn-success rounded-pill px-3" style="font-size: 11px; font-weight: 700; min-width: 100px;">
+                                                            AVAILABLE
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button type="submit" class="btn btn-sm btn-secondary rounded-pill px-3" style="font-size: 11px; font-weight: 700; min-width: 100px;">
+                                                            UNAVAILABLE
+                                                        </button>
+                                                    }
+                                                </form>
+                                            </td>
+                                            <td class="pe-4 text-center">
+                                               
+                                                @* Delete Link *@
+                                                <a asp-controller="Dashboard"
+                                                   asp-action="DeleteService"
+                                                   asp-route-id="@service.Id"
+                                                   class="btn btn-action"
+                                                   onclick="return confirm('Are you sure you want to delete this service?')">
+                                                    <i class="bi bi-trash text-danger"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="7" class="text-center p-4 text-muted">No services found in the database.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="appointments-section" class="content-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold">Appointment Management</h2>
+                    <p class="text-muted">View and manage all appointments</p>
+                </div>
+                <div class="search-container">
+                    <i class="bi bi-search"></i>
+                    <input type="text" class="form-control" placeholder="Search appointments...">
+                </div>
+            </div>
+
+            <div class="card data-card shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Appointment ID</th>
+                                    <th>Customer</th>
+                                    <th>Service</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Staff</th>
+                                    <th>Status</th>
+                                    <th class="pe-4 text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ViewBag.AllAppointments != null)
+                                {
+                                    foreach (var appt in ViewBag.AllAppointments)
+                                    {
+                                        <tr>
+                                            <td class="ps-4 fw-medium">@appt.ReferenceNumber</td>
+                                            <td>@appt.CustomerName</td>
+                                            <td>@appt.ServiceName</td>
+                                            <td>@appt.RawDate.ToString("yyyy-MM-dd")</td>
+                                            <td>@appt.Time</td>
+                                            <td>@(string.IsNullOrEmpty(appt.Staff) || appt.Staff == "Unassigned" ? "Not Assigned" : appt.Staff)</td>
+                                            <td>
+                                                @if (appt.Status == "CONFIRMED")
+                                                {
+                                                    <span class="status-badge-confirmed">CONFIRMED</span>
+                                                }
+                                                else if (appt.Status == "CANCELLED")
+                                                {
+                                                    <span class="badge bg-danger">CANCELLED</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">@appt.Status</span>
+                                                }
+                                            </td>
+                                            <td class="pe-4 text-center">
+                                                
+
+                                                <form asp-action="CancelAppointment" asp-controller="Booking" method="post" style="display:inline;">
+                                                    <input type="hidden" name="appointmentId" value="@appt.AppointmentId" />
+                                                    <button type="submit" class="btn btn-cancel" onclick="return confirm('Are you sure you want to cancel this booking?')">Cancel</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="8" class="text-center py-4 text-muted">No appointments found.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="staff-section" class="content-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold">Staff Management</h2>
+                    <p class="text-muted">Manage your expert team</p>
+                </div>
+                <button class="btn btn-add-service" data-bs-toggle="modal" data-bs-target="#addStaffModal">
+                    <i class="bi bi-plus-lg"></i> Add Staff
+                </button>
+            </div>
+
+            <div class="row g-4">
+                @if (ViewBag.StaffList != null)
+                {
+                    foreach (var staff in ViewBag.StaffList)
+                    {
+                        <div class="col-md-4">
+                            <div class="card staff-card shadow-sm border-0 @(staff.IsActive ? "" : "opacity-75")">
+                                <div class="card-body text-center p-4">
+                                    <div class="staff-avatar mb-3">@(staff.Name.Substring(0, 1))</div>
+
+                                    <h5 class="fw-bold mb-1">@staff.Name</h5>
+                                    <p class="text-purple small fw-bold mb-2">@staff.Specialization</p>
+
+                                    <div class="small text-muted mb-3">
+                                        <i class="bi bi-envelope"></i> @staff.Email
+                                    </div>
+
+                                    <div class="d-flex justify-content-center gap-2 mb-4">
+                                        @if (staff.IsActive)
+                                        {
+                                            <span class="status-badge-available">Available</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-badge-busy">On Leave</span>
+                                        }
+                                    </div>
+
+                                    <div class="d-grid gap-2">
+
+                                        <form asp-action="ToggleStaffStatus" asp-controller="Dashboard" method="post">
+                                            <input type="hidden" name="id" value="@staff.StaffId" />
+                                            <button type="submit" class="btn btn-outline-secondary btn-sm w-100">
+                                                @(staff.IsActive ? "Set as Away" : "Set as Available")
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+
+        <div id="users-section" class="content-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold">User Management</h2>
+                    <p class="text-muted">Manage registered customers and admin accounts</p>
+                </div>
+                <button class="btn btn-add-service"><i class="bi bi-person-plus"></i> Add New User</button>
+            </div>
+
+            <div class="card data-card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">User ID</th>
+                                    <th>Full Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Role</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ViewBag.UserList != null)
+                                {
+                                    foreach (var user in ViewBag.UserList)
+                                    {
+                                        <tr>
+                                            <td class="ps-4 fw-medium text-purple">@user.DisplayId</td>
+                                            <td>@user.Username</td>
+                                            <td>@user.Email</td>
+                                            <td>@user.Phone</td>
+                                            <td>
+                                                @{
+                                                    string badgeClass = "bg-info"; // Blue
+                                                    if (user.Role == "Admin") { badgeClass = "bg-success"; } // Green
+                                                    else if (user.Role == "Staff") { badgeClass = "bg-warning text-dark"; } // Yellow
+                                                }
+                                                <span class="badge @badgeClass text-uppercase" style="font-size: 0.7rem;">
+                                                    @user.Role
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Function for manual clicks
+        function showSection(sectionName, element) {
+            // 1. Remove active class from all nav links
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => link.classList.remove('active'));
+
+            // 2. Add active class to clicked element
+            if (element) {
+                element.classList.add('active');
+            }
+
+            // 3. Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(sec => sec.classList.remove('active-section'));
+
+            // 4. Show target section
+            const target = document.getElementById(sectionName + '-section');
+            if (target) {
+                target.classList.add('active-section');
+            }
+        }
+
+        // Combined Logic for handling Redirects and URL cleanup
+        document.addEventListener("DOMContentLoaded", function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const allLinks = document.querySelectorAll('.nav-link');
+            const section = urlParams.get('section');
+
+            // Handle Specific Section Redirects (Staff or Users)
+            if (section) {
+                const targetBtn = document.querySelector(`[data-section="${section}-section"]`);
+                if (targetBtn) {
+                    showSection(section, targetBtn);
+                }
+            }
+
+            // Handle Services Section Redirect
+            if (urlParams.has('showServices')) {
+                let servicesBtn = null;
+                allLinks.forEach(link => {
+                    if (link.getAttribute('onclick') && link.getAttribute('onclick').includes('services')) {
+                        servicesBtn = link;
+                    }
+                });
+
+                if (servicesBtn) {
+                    showSection('services', servicesBtn);
+                }
+            }
+
+            // Clean the URL so a refresh doesn't force the tab change again
+            if (urlParams.has('section') || urlParams.has('showServices')) {
+                const newUrl = window.location.pathname;
+                window.history.replaceState({}, document.title, newUrl);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,23 +1,37 @@
-﻿
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using SpaWellnessAppointmentManagementSystem.Services;
+using SpaWellnessAppointmentManagementSystem.Repo.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// 1. ADD SERVICES TO THE CONTAINER
 builder.Services.AddControllersWithViews();
 
-// Optional (dev convenience): hot reload of Razor views
-// builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
+// Essential for Session and HttpContextAccessor
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.Name = ".SerenitySpa.Session"; // Good practice to name your cookie
+});
+
+// Dependency Injection: Service Registration
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+// Database Configuration
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// 2. CONFIGURE THE HTTP REQUEST PIPELINE
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-    app.UseStatusCodePages(); // optional: simple pages for 404/500 in dev
 }
 else
 {
@@ -26,27 +40,18 @@ else
 }
 
 app.UseHttpsRedirection();
-
-// ✅ Serves static files from wwwroot
 app.UseStaticFiles();
 
-// ✅ Enables endpoint routing
 app.UseRouting();
 
-// If you add authentication later, enable it before authorization:
-// app.UseAuthentication();
+// THE SECURITY TRIO (Order is critical)
+app.UseSession(); // Must be before Authentication/Authorization
+app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 
-// ✅ Conventional MVC routing: default goes to Home/Index
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// If also using Razor Pages (not necessary for pure MVC):
-// app.MapRazorPages();
-
 app.Run();
-
-
-
-

@@ -1,5 +1,5 @@
 <Solution>
   <Project Path="SpaWellnessAppointmentManagementSystem.Repo/SpaWellnessAppointmentManagementSystem.Repo.csproj" Id="86e1f501-19fc-4e2e-8f27-97cd8b7a9c7f" />
-  <Project Path="SpaWellnessAppointmentManagementSystem.services/SpaWellnessAppointmentManagementSystem.services.csproj" DisplayName="SpaWellnessAppointmentManagementSystem.Services" Id="d2c8c539-7efe-4088-bc48-bb69397cb8c6" />
-  <Project Path="SpaWellnessAppointmentManagementSystem.web/SpaWellnessAppointmentManagementSystem.web.csproj" DisplayName="SpaWellnessAppointmentManagementSystem.Web" />
+  <Project Path="SpaWellnessAppointmentManagementSystem.services/SpaWellnessAppointmentManagementSystem.services.csproj" Id="d2c8c539-7efe-4088-bc48-bb69397cb8c6" />
+  <Project Path="SpaWellnessAppointmentManagementSystem.web/SpaWellnessAppointmentManagementSystem.web.csproj" />
 </Solution>

@@ -1,0 +1,224 @@
+﻿@model SpaWellnessAppointmentManagementSystem.Repo.Models.SpaService
+@{
+    Layout = null;
+    double price = (double)(Model.Price);
+    double tax = price * 0.05;
+    double total = price + tax;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@Model.Name - Serenity Spa</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        /* Keeping your existing styles ... */
+        .service-header-card {
+            background: linear-gradient(135deg, #7b2ff7 0%, #f107a3 100%);
+            border-radius: 15px 15px 0 0;
+            padding: 40px;
+        }
+
+        .booking-sidebar {
+            position: sticky;
+            top: 20px;
+            border-radius: 15px;
+            border: 1px solid #eee;
+        }
+
+        .time-slot {
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            padding: 10px 5px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+            .time-slot.selected {
+                background: linear-gradient(135deg, #9333ea 0%, #ec4899 100%) !important;
+                color: white !important;
+                font-weight: bold;
+            }
+
+        .btn-booking {
+            background: linear-gradient(135deg, #c084fc, #f472b6);
+            color: white;
+            border: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body style="background-color: #fdf4ff;">
+    <div class="container py-4">
+        <div class="row mb-3">
+            <div class="col-12">
+                <a asp-controller="Booking" asp-action="Index" class="btn btn-link text-decoration-none text-dark fw-bold p-0">
+                    <span class="me-2">←</span> Back to Services
+                </a>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                    <div class="service-header-card text-center">
+                        <span style="font-size: 80px;">@Model.Icon</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h2 class="fw-bold mb-0">@Model.Name</h2>
+                            <span class="badge bg-success px-3 py-2">Available</span>
+                        </div>
+                        <p class="text-muted mb-4">@Model.Category</p>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="p-3 border rounded-3 bg-light d-flex align-items-center">
+                                    <span class="me-3" style="font-size: 24px;">⏱️</span>
+                                    <div>
+                                        <small class="text-muted d-block">Duration</small>
+                                        <strong>@Model.Duration</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 border rounded-3 bg-light d-flex align-items-center">
+                                    <span class="me-3" style="font-size: 24px;">💰</span>
+                                    <div>
+                                        <small class="text-muted d-block">Price</small>
+                                        <strong>₹@Model.Price</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold mb-3">Service Description</h5>
+                        <div class="text-muted mb-4 lh-lg">
+                            @Model.Description @* Now dynamically showing the full description from DB *@
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h3 class="fw-bold mb-3">What to Expect</h3>
+                        <ul class="list-unstyled">
+                            @if (!string.IsNullOrEmpty(Model.WhatToExpect))
+                            {
+                                // This splits your database text by commas and loops through them
+                                foreach (var point in Model.WhatToExpect.Split(','))
+                                {
+                                    <li class="mb-2 d-flex align-items-start">
+                                        <span class="text-success me-2">✓</span>
+                                        <span class="text-muted">@point.Trim()</span>
+                                    </li>
+                                }
+                            }
+                            else
+                            {
+                                <li class="text-muted">Professional consultation before treatment</li>
+                                <li class="text-muted">Premium products and equipment</li>
+                                <li class="text-muted">Personalized treatment approach</li>
+                                <li class="text-muted">Relaxing ambiance and environment</li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <form asp-controller="Booking" asp-action="BookingConfirmation" method="post">
+                    <input type="hidden" name="serviceName" value="@Model.Name" />
+                    <input type="hidden" name="category" value="@Model.Category" />
+                    <input type="hidden" name="duration" value="@Model.Duration" />
+                    <input type="hidden" name="price" value="@price" />
+                    <input type="hidden" name="tax" value="@tax" />
+                    <input type="hidden" name="totalPrice" value="@total" />
+                    <input type="hidden" id="selectedTime" name="selectedTime" />
+
+                    <div class="card booking-sidebar shadow-sm p-4 bg-white">
+                        <h5 class="fw-bold mb-4">Book Your Appointment</h5>
+
+                        <label class="small fw-bold mb-2">📅 Select Date</label>
+                        <input type="date" name="appointmentDate" class="form-control mb-4" id="appointmentDate" required>
+
+                        <label class="small fw-bold mb-2">🕘 Select Time</label>
+                        <div class="row g-2 mb-4">
+                            @foreach (var time in new[] { "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM" })
+                            {
+                                <div class="col-6"><div class="time-slot text-center">@time</div></div>
+                            }
+                        </div>
+
+                        <label class="small fw-bold mb-2">👤 Select Therapist</label>
+                        <select class="form-select" id="therapistSelect" name="therapist">
+                            <option value="">Any Available Specialist</option>
+                            @if (ViewBag.StaffList != null)
+                            {
+                                foreach (var staff in ViewBag.StaffList)
+                                {
+                                    /* Changed value to @staff.FullName.
+                                    The dashboard searches for the NAME string, not the ID.
+                                    */
+                                    <option value="@staff.FullName">@staff.FullName (@staff.Specialization)</option>
+                                }
+                            }
+                        </select>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Service Fee</span>
+                            <span>₹@price.ToString("F2")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Tax (5%)</span>
+                            <span>₹@tax.ToString("F2")</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-4">
+                            <span class="fw-bold">Total</span>
+                            <span class="fw-bold text-primary fs-4">₹@total.ToString("F2")</span>
+                        </div>
+
+                        <button type="submit" id="btnProceed" class="btn btn-booking w-100 py-3 rounded-3 opacity-75" disabled>Proceed to Booking</button>
+                        <p id="helperText" class="text-center small text-muted mt-2">Please select date and time</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Booking Logic
+            const today = new Date().toISOString().split('T')[0];
+            $('#appointmentDate').attr('min', today);
+
+            $('.time-slot').on('click', function () {
+                $('.time-slot').removeClass('selected');
+                $(this).addClass('selected');
+                $('#selectedTime').val($(this).text());
+                validateBooking();
+            });
+
+            $('#appointmentDate').on('change', validateBooking);
+
+            function validateBooking() {
+                const dateVal = $('#appointmentDate').val();
+                const hasTime = $('.time-slot.selected').length > 0;
+                const btn = $('#btnProceed');
+                const helper = $('#helperText');
+
+                if (dateVal && hasTime) {
+                    btn.prop('disabled', false).removeClass('opacity-75');
+                    helper.text("Perfect! Ready to book.").addClass('text-success fw-bold');
+                } else {
+                    btn.prop('disabled', true).addClass('opacity-75');
+                    helper.text("Please select date and time").removeClass('text-success fw-bold');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
